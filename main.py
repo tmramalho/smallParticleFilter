@@ -21,15 +21,15 @@ if __name__ == '__main__':
 	
 	dataGen = GenerateTestData(oscillator, x0.size)
 	pltWorker = extPlot()
-	samplingTime = 1
 	numSamples = 10
+	samplingTime = 10.0/float(numSamples)
 	dt = 0.01
-	(x,y) = dataGen.generateSamplePointsGG(samplingTime, numSamples, dt, x0, 0.1, 0)
+	(x,y) = dataGen.generateSamplePointsGG(samplingTime, numSamples, dt, x0, 0.1, 0.1)
 	print 'samplePoints generated'
 	
 	finalTime = samplingTime*(numSamples-1)
 	pf = ParticleFilter(oscillator, x0.size)
-	pf.runFilter(y, samplingTime, dt, 0.1, 0.2)
+	pf.runFilter(y, samplingTime, dt, 0.1, 0.1)
 	z = pf.getAveragePath()
 	pltWorker.plotPath(x, finalTime, 0.5)
 	pltWorker.plotMarkers(y, finalTime)

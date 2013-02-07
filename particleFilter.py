@@ -56,13 +56,12 @@ class ParticleFilter(object):
 		self.x.append(xp)
 		self.w.append(wp/np.sum(wp))
 		for i in xrange(1, self.numSamples):
-			xp = self.evolvePoints(xp)
-			wp = wp*self.mvGaussian(xp, y[i], self.obsCov)
+			xn = self.resample(xp, wp)
+			xp = self.evolvePoints(xn)
+			wp = self.mvGaussian(xp, y[i], self.obsCov)
 			wp = wp/np.sum(wp)
 			neff = 1/np.sum(np.power(wp,2))
 			print neff
-			if neff < nth:
-				xp, wp = self.resample(xp, wp)
 			self.x.append(xp)
 			self.w.append(wp)
 			print 'sample', i
@@ -72,8 +71,7 @@ class ParticleFilter(object):
 		prob = st.rv_discrete(values=(iprev,wp))
 		inext = prob.rvs(size = self.numParticles) #new particle indexes
 		xr = xp[inext]
-		wr = np.ones(self.numParticles)/self.numParticles
-		return xr, wr
+		return xr
 		
 	def getAveragePath(self):
 		averages = []
