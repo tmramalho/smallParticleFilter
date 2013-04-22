@@ -103,14 +103,14 @@ class extPlot():
 		im = numPlots
 		for ax in axes:
 			if cl == 'map':
-				col = cm.hsv(float(i)/im,1)
+				col = cm.Set2(float(i)/im,1)
 			else:
 				col = cl
 			l = ax.plot(t, av[:, i])
 			plt.setp(l, color=col, ls=lstyle, alpha=a, linewidth=lw)
 			i += 1
 			
-	def plotMarkers(self, av, time, a = 1.0, mk = 'o', cl='map'):
+	def plotMarkers(self, av, time, a = 1.0, mk = 'o', cl='map', ms=4):
 		try:
 			numPlots = len(av[0])
 		except TypeError:
@@ -124,11 +124,11 @@ class extPlot():
 		im = numPlots
 		for ax in axes:
 			if cl == 'map':
-				col = cm.hsv(float(i)/im,1)
+				col = cm.Set2(float(i)/im,1)
 			else:
 				col = cl
 			l = ax.plot(t, av[:, i], zorder=100)
-			plt.setp(l, color=col, ls='None', marker=mk, alpha=a)
+			plt.setp(l, color=col, ls='None', marker=mk, alpha=a, markersize=ms)
 			i += 1
 		
 	def plotHistogramPoints(self, x):

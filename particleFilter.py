@@ -39,7 +39,7 @@ class ParticleFilter(object):
 				xp += self.dt*self.func.run(xp) + self.sdt*xsi
 		return xn
 		
-	def runFilter(self, y, samplingTime, dt, procSigma, obsSigma, nth = 50, numParticles = 100):
+	def runFilter(self, y, samplingTime, dt, procSigma, obsSigma, numParticles = 100):
 		self.x = []
 		self.w = []
 		self.dt = dt
@@ -60,11 +60,11 @@ class ParticleFilter(object):
 			xp = self.evolvePoints(xn)
 			wp = self.mvGaussian(xp, y[i], self.obsCov)
 			wp = wp/np.sum(wp)
-			neff = 1/np.sum(np.power(wp,2))
-			print neff
+			#neff = 1/np.sum(np.power(wp,2))
+			#print neff
 			self.x.append(xp)
 			self.w.append(wp)
-			print 'sample', i
+			#print 'sample', i
 		
 	def resample(self, xp, wp):
 		iprev = range(0, self.numParticles) #particle indexes
