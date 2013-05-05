@@ -20,7 +20,7 @@ class PolContainer(object):
 		by calling setParams
 		'''
 		params = {}
-		params['mu'] = 0.1
+		params['mu'] = 0.5
 		params['w'] = np.array([2.0, 1.0, 2.0])
 		params['A'] = np.array([[0,2,0],[5,0,0],[0,3,0]])
 		self.setParams(params)

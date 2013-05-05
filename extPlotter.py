@@ -9,9 +9,10 @@ import numpy as np
 import pylab as plot
 import matplotlib.pyplot as plt
 import matplotlib.figure as fig
-import matplotlib.cm as cm
 import matplotlib.backends.backend_agg as bkc
+from mpl_toolkits.mplot3d import Axes3D
 import scipy.special as sp
+import matplotlib.colors as col
 
 def gaussian(x, m, s):
 	xa = np.zeros((x.shape[0],m.shape[0]))
@@ -76,7 +77,7 @@ class extPlot():
 		t = np.arange(0, time, dt)
 		for ax in axes:
 			if cl == 'map':
-				col = cm.hsv(float(i)/im,1)
+				col = plt.cm.hsv(float(i)/im,1)
 			else:
 				col = cl
 			l = ax.plot(t, av[:, i])
@@ -103,7 +104,7 @@ class extPlot():
 		im = numPlots
 		for ax in axes:
 			if cl == 'map':
-				col = cm.Set2(float(i)/im,1)
+				col = plt.cm.Set2(float(i)/im,1)
 			else:
 				col = cl
 			l = ax.plot(t, av[:, i])
@@ -124,12 +125,29 @@ class extPlot():
 		im = numPlots
 		for ax in axes:
 			if cl == 'map':
-				col = cm.Set2(float(i)/im,1)
+				col = plt.cm.Set2(float(i)/im,1)
 			else:
 				col = cl
 			l = ax.plot(t, av[:, i], zorder=100)
 			plt.setp(l, color=col, ls='None', marker=mk, alpha=a, markersize=ms)
 			i += 1
+			
+	def plotPFMarkers(self, x, w, time):
+		#1st dim is time 2nd numparticles 3rd system dims
+		x = np.array(x)
+		w = np.array(w)
+		try:
+			numPlots = x.shape[2]
+		except TypeError:
+			numPlots = 1
+		axes = self.checkFigureStatus(numPlots)
+		times = np.linspace(0, time, x.shape[0])
+		times = np.repeat(times, x.shape[1])
+		times += np.random.rand(times.size)*0.5 - 0.25
+		norm = col.Normalize(vmin = np.min(w), vmax = np.max(w))
+		weights = plt.cm.jet(norm(np.ravel(w)), 0.5)
+		for i,ax in enumerate(axes):
+			ax.scatter(times, np.ravel(x[:, :, i]), c=weights)
 		
 	def plotHistogramPoints(self, x):
 		axes = self.checkFigureStatus(1)
@@ -138,7 +156,7 @@ class extPlot():
 		im = len(x[0])
 		for p in patches: #iterate all dimensions
 			for artist in p: #iterate all the rectangles
-				artist.set_color(cm.hsv(float(i)/im,1))
+				artist.set_color(plt.cm.hsv(float(i)/im,1))
 			i += 1
 		
 	def plotHistogramPrediction(self, m, s, a = 1.0, lw = 2.0):
@@ -158,6 +176,7 @@ class extPlot():
 		l = axes[0].plot(t, 1 / (2*sp.gamma(df/2)) * np.power(t/2,df/2-1) * np.exp(-t/2))
 		plt.setp(l, linewidth=2)
 		axes[0].set_xlim(0,16) #TODO: this should not be hardcoded
+		
 		
 	def plotHeatMap(self, c):
 		axes = self.checkFigureStatus(1)

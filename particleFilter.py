@@ -30,6 +30,15 @@ class ParticleFilter(object):
 		dp = np.diag(np.inner(pts - av, ip)) # (av-pt)^T*C^-1*(av-pt)
 		gauss = np.exp(-dp/2)*np.power(2*np.pi, -self.dim*0.5)*np.power(np.linalg.det(cov), -0.5)
 		return gauss
+	
+	def Gaussian(self, pts, avs, cov):
+		gauss = np.zeros(pts.shape[0])
+		invCov = np.linalg.inv(cov)
+		detc = np.linalg.det(cov)
+		for i,x in enumerate(pts):
+			dp = np.dot((x - avs), np.dot(invCov, (x - avs)))# (av-pt)^T*C^-1*(av-pt)
+			gauss[i] = np.exp(-dp/2)*np.power(2*np.pi, -self.dim*0.5)*np.power(detc, -0.5)
+		return gauss
 		
 	def evolvePoints(self, x0):
 		xn = np.copy(x0)
@@ -52,20 +61,22 @@ class ParticleFilter(object):
 		self.numParticles = numParticles
 		'''for initial guess we use a gaussian around y[0]'''
 		xp = np.tile(y[0], (numParticles,1)) + np.random.multivariate_normal(self.noiseAv, self.procCov, self.numParticles)
-		wp = self.mvGaussian(xp, y[0], self.obsCov)
+		wp = self.Gaussian(xp, y[0], self.obsCov)
 		self.x.append(xp)
 		self.w.append(wp/np.sum(wp))
 		for i in xrange(1, self.numSamples):
 			xn = self.resample(xp, wp)
 			xp = self.evolvePoints(xn)
-			wp = self.mvGaussian(xp, y[i], self.obsCov)
+			wp = self.Gaussian(xp, y[i], self.obsCov)
 			wp = wp/np.sum(wp)
 			#neff = 1/np.sum(np.power(wp,2))
 			#print neff
+			#print xp, wp
+			#raw_input("Press Enter to continue...")
 			self.x.append(xp)
 			self.w.append(wp)
 			#print 'sample', i
-		
+			
 	def resample(self, xp, wp):
 		iprev = range(0, self.numParticles) #particle indexes
 		prob = st.rv_discrete(values=(iprev,wp))
@@ -79,7 +90,7 @@ class ParticleFilter(object):
 			av = 0
 			particles = self.x[i]
 			weights = self.w[i]
-			for j in xrange(1, weights.size):
+			for j in xrange(0, weights.size):
 				av += particles[j]*weights[j]
 			averages.append(av)
 		return np.array(averages)
